@@ -191,3 +191,47 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- 
+
+-- 1- Insérer un film : Ajouter un nouveau film intitulé Data Science Adventures dans le genre "Documentary".
+INSERT INTO movies (title, Genre) VALUES ("Data Science Adventures", "Documentary");
+
+-- 2- Rechercher des films : Lister tous les films du genre "Comedy" sortis après 2020
+
+SELECT * FROM movies WHERE Genre = 'Comedy' AND ReleaseYear > 2020;
+
+-- 3- Mise à jour des abonnements : Passer tous les utilisateurs de "Basic" à "Premium"..
+UPDATE users u
+JOIN subscription s_basic ON u.SubscriptionID = s_basic.SubscriptionID
+JOIN subscription s_premium ON s_premium.SubscriptionType = 'Premium'
+SET u.SubscriptionID = s_premium.SubscriptionID
+WHERE s_basic.SubscriptionType = 'Basic';
+
+-- 4 - Afficher les abonnements : Joindre les utilisateurs à leurs types d'abonnements.
+SELECT u.firstName, u.lastName, s.SubscriptionType
+FROM users u
+JOIN subscription s ON u.SubscriptionID = s.SubscriptionID;
+
+-- 5 - Filtrer les visionnages : Trouver tous les utilisateurs ayant terminé de regarder un film.
+SELECT u.firstName, u.lastName, w.CompletionPercentage FROM users u JOIN watchhistory w ON u.userID = w.UserID WHERE CompletionPercentage = 100;
+
+-- 6 - Trier et limiter : Afficher les 5 films les plus longs, triés par durée.
+SELECT Title, Duration FROM movies ORDER BY Duration LIMIT 5;
+
+-- 7 - Agrégation : Calculer le pourcentage moyen de complétion pour chaque film.
+
+SELECT MovieID, 
+AVG(CompletionPercentage) 
+AS AverageCompletionPercentage
+FROM watchhistory
+GROUP BY MovieID;
+
+-- 8- Sous-requête (Bonus): Trouver les films ayant une note moyenne supérieure à 4.
+SELECT m.MovieID, m.Title
+FROM movies m
+WHERE (
+    SELECT AVG(r.Rating)
+    FROM review r
+    WHERE r.MovieID = m.MovieID
+) > 4;
